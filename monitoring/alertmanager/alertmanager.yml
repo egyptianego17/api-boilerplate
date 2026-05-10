@@ -1,0 +1,58 @@
+global:
+  resolve_timeout: 5m
+  # ── SMTP via SendGrid ──
+  smtp_smarthost: '${SMTP_SMARTHOST}'
+  smtp_from: '${ALERT_EMAIL_FROM}'
+  smtp_auth_username: '${SMTP_USERNAME}'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default'
+  routes:
+    - matchers:
+        - severity="critical"
+      receiver: 'critical'
+      repeat_interval: 1h
+    - matchers:
+        - severity="warning"
+      receiver: 'default'
+      repeat_interval: 4h
+
+receivers:
+  - name: 'default'
+    # Uncomment when Slack is configured:
+    # slack_configs:
+    #   - api_url: '${SLACK_WEBHOOK_URL}'
+    #     channel: '#alerts'
+    #     title: '{{ .GroupLabels.alertname }}'
+    #     text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+    #     send_resolved: true
+
+    email_configs:
+      - to: '${ALERT_EMAIL_TO}'
+        send_resolved: true
+
+  - name: 'critical'
+    # Uncomment when Slack is configured:
+    # slack_configs:
+    #   - api_url: '${SLACK_WEBHOOK_URL}'
+    #     channel: '#alerts-critical'
+    #     title: ':rotating_light: {{ .GroupLabels.alertname }}'
+    #     text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+    #     send_resolved: true
+
+    email_configs:
+      - to: '${ALERT_EMAIL_TO}'
+        send_resolved: true
+
+inhibit_rules:
+  - source_matchers:
+      - severity="critical"
+    target_matchers:
+      - severity="warning"
+    equal: ['alertname']

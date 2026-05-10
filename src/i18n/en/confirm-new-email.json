@@ -1,0 +1,8 @@
+{
+  "greeting": "Hello,",
+  "text1": "You have requested to change your email address for your API Boilerplate account.",
+  "text2": "To confirm your new email address, please use the verification code above.",
+  "text3": "This code will expire in 10 minutes.",
+  "text4": "If you did not request this change, please ignore this email and your current email address will remain unchanged.",
+  "allRights": "All rights reserved"
+}

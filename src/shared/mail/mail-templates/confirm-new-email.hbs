@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang='{{lang}}'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <meta name='color-scheme' content='light' />
+    <title>{{t 'common.confirmEmail'}}</title>
+    {{> styles}}
+  </head>
+  <body>
+    <div class='page'>
+      <div class='card'>
+        {{> header}}
+
+        <div class='content'>
+          <span class='eyebrow'>{{upper (t 'common.confirmEmail')}}</span>
+          <h1 class='heading'>{{t 'confirm-new-email.text1'}}</h1>
+
+          <p class='lede'>{{t 'confirm-new-email.text2'}}</p>
+
+          <div class='code-panel'>
+            <span class='code-label'>{{upper (t 'common.confirmEmail')}}</span>
+            <span class='code'>{{hash}}</span>
+          </div>
+
+          <p class='muted'>{{t 'confirm-new-email.text3'}}</p>
+        </div>
+
+        {{> footer
+          footerText=(t 'confirm-new-email.text4')
+          allRights=(t 'confirm-new-email.allRights')
+        }}
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,221 @@
+services:
+  api-boilerplate-staging:
+    env_file:
+      - .env.staging
+    container_name: api-boilerplate-staging
+    restart: always
+    build: .
+    ports:
+      - '3001:3000'
+    depends_on:
+      - postgres-staging
+      - redis-staging
+    networks:
+      - api-staging
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health/liveness']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres-staging:
+    image: postgres:15
+    container_name: api-boilerplate-postgres-staging
+    restart: always
+    env_file:
+      - .env.staging
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_DB: ${DB_DATABASE:-api_boilerplate_staging}
+      TZ: 'GMT'
+      PGTZ: 'GMT'
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres-staging:/var/lib/postgresql/data
+      - ./init-data.sh:/docker-entrypoint-initdb.d/init-data.sh
+    networks:
+      - api-staging
+
+  pgadmin-staging:
+    container_name: api-boilerplate-pgadmin-staging
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - '5051:80'
+    volumes:
+      - pgadmin-staging:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    networks:
+      - api-staging
+    depends_on:
+      - postgres-staging
+
+  minio-staging:
+    container_name: api-boilerplate-minio-staging
+    image: minio/minio:latest
+    restart: always
+    ports:
+      - '9002:9000'
+      - '9003:9001'
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio-staging:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - api-staging
+
+  minio-create-bucket-staging:
+    container_name: api-boilerplate-minio-create-bucket-staging
+    image: minio/mc:latest
+    depends_on:
+      - minio-staging
+    networks:
+      - api-staging
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio-staging:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin};
+      mc mb myminio/${AWS_S3_BUCKET_NAME:-api-boilerplate} --ignore-existing;
+      mc anonymous set public myminio/${AWS_S3_BUCKET_NAME:-api-boilerplate};
+      exit 0;
+      "
+
+  redis-staging:
+    container_name: api-boilerplate-redis-staging
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - '6380:6379'
+    volumes:
+      - redis-staging:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy noeviction
+    networks:
+      - api-staging
+
+  alertmanager-staging:
+    container_name: api-boilerplate-alertmanager-staging
+    image: prom/alertmanager:latest
+    restart: always
+    ports:
+      - '9094:9093'
+    environment:
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+      SMTP_SMARTHOST: ${SMTP_SMARTHOST:-smtp.sendgrid.net:587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-apikey}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-${SENDGRID_API_KEY}}
+      ALERT_EMAIL_TO: ${ALERT_EMAIL_TO:-${MAIL_DEFAULT_EMAIL}}
+      ALERT_EMAIL_FROM: ${ALERT_EMAIL_FROM:-${MAIL_DEFAULT_EMAIL}}
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.tmpl:ro
+      - ./monitoring/alertmanager/docker-entrypoint.sh:/etc/alertmanager/docker-entrypoint.sh:ro
+    entrypoint: ['/bin/sh', '/etc/alertmanager/docker-entrypoint.sh']
+    networks:
+      - api-staging
+
+  postgres-exporter-staging:
+    container_name: api-boilerplate-postgres-exporter-staging
+    image: prometheuscommunity/postgres-exporter:latest
+    restart: always
+    environment:
+      DATA_SOURCE_NAME: 'postgresql://${DB_USERNAME:-postgres}:${DB_PASSWORD:-postgres}@postgres-staging:5432/${DB_DATABASE:-api_boilerplate_staging}?sslmode=disable'
+    ports:
+      - '9187:9187'
+    networks:
+      - api-staging
+
+  redis-exporter-staging:
+    container_name: api-boilerplate-redis-exporter-staging
+    image: oliver006/redis_exporter:latest
+    restart: always
+    environment:
+      REDIS_ADDR: 'redis://redis-staging:6379'
+    ports:
+      - '9121:9121'
+    networks:
+      - api-staging
+
+  prometheus-staging:
+    container_name: api-boilerplate-prometheus-staging
+    image: prom/prometheus:latest
+    restart: always
+    ports:
+      - '9093:9090'
+    volumes:
+      - ./monitoring/prometheus-staging.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts:/etc/prometheus/rules/alerts:ro
+      - ./monitoring/recording.rules.yml:/etc/prometheus/rules/recording.rules.yml:ro
+      - prometheus-staging:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    depends_on:
+      - alertmanager-staging
+    networks:
+      api-staging:
+        aliases:
+          - prometheus
+
+  loki-staging:
+    container_name: api-boilerplate-loki-staging
+    image: grafana/loki:3.4.2
+    restart: always
+    user: '10001:10001'
+    ports:
+      - '3101:3100'
+    volumes:
+      - ./monitoring/loki-config.yml:/etc/loki/config.yml:ro
+      - loki-staging:/loki
+    command: -config.file=/etc/loki/config.yml
+    networks:
+      api-staging:
+        aliases:
+          - loki
+
+  grafana-staging:
+    container_name: api-boilerplate-grafana-staging
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - '3201:3000'
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
+      - grafana-staging:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_DEFAULT_THEME: dark
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/dashboards/api-overview.json
+    depends_on:
+      - prometheus-staging
+      - loki-staging
+    networks:
+      - api-staging
+
+networks:
+  api-staging:
+    driver: bridge
+
+volumes:
+  postgres-staging:
+    driver: local
+  pgadmin-staging:
+    driver: local
+  minio-staging:
+    driver: local
+  redis-staging:
+    driver: local
+  prometheus-staging:
+    driver: local
+  loki-staging:
+    driver: local
+  grafana-staging:
+    driver: local

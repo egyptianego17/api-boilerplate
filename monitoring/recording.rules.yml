@@ -1,0 +1,21 @@
+groups:
+  - name: api_aggregations
+    interval: 1m
+    rules:
+      - record: job:http_requests_total:rate5m
+        expr: sum(rate(http_requests_total[5m])) by (job, method, status_code)
+
+      - record: job:http_request_duration_seconds:p95_5m
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (job, le))
+
+      - record: job:http_request_duration_seconds:p50_5m
+        expr: histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (job, le))
+
+      - record: job:http_request_duration_seconds:p99_5m
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (job, le))
+
+      - record: job:http_requests_errors:rate5m
+        expr: sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (job)
+
+      - record: job:http_requests_total:rate5m_total
+        expr: sum(rate(http_requests_total[5m])) by (job)

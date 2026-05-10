@@ -1,0 +1,38 @@
+groups:
+  - name: api
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status_code=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: '5xx error rate > 5%'
+          description: 'The 5xx error rate has been above 5% for more than 2 minutes. Current value: {{ $value | humanizePercentage }}'
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'p95 latency > 2s'
+          description: '95th percentile request latency has exceeded 2 seconds for 5 minutes. Current value: {{ $value | humanizeDuration }}'
+
+      - alert: BullMQQueueBacklog
+        expr: sum(bullmq_jobs{state=~"waiting|delayed"}) > 200
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'BullMQ queue backlog > 200 jobs'
+          description: 'Waiting + delayed jobs have exceeded 200 for 5 minutes. Current value: {{ $value }}'
+
+      - alert: HighErrorRateByRoute
+        expr: sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (route) / sum(rate(http_requests_total[5m])) by (route) > 0.10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Route {{ $labels.route }} has > 10% error rate'
+          description: 'Route {{ $labels.route }} 5xx rate: {{ $value | humanizePercentage }}'

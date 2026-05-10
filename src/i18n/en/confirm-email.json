@@ -1,0 +1,8 @@
+{
+  "greeting": "Hello,",
+  "text1": "Thank you for signing up with API Boilerplate!",
+  "text2": "To complete your registration and verify your email address, please use the verification code above.",
+  "text3": "This code will expire in 10 minutes.",
+  "text4": "If you did not create an account, please ignore this email.",
+  "allRights": "All rights reserved"
+}

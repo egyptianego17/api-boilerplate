@@ -1,0 +1,328 @@
+<link href='https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap' rel='stylesheet' />
+<style>
+  body, table, td, p, a, li {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+  table { border-collapse: collapse !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+  img {
+    -ms-interpolation-mode: bicubic;
+    border: 0;
+    outline: none;
+    text-decoration: none;
+    display: block;
+    height: auto;
+  }
+  a { text-decoration: none; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #F4F6FA;
+    color: #001345;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { width: 100%; background-color: #F4F6FA; padding: 24px 0; }
+  .card {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 19, 69, 0.04), 0 8px 24px rgba(0, 19, 69, 0.06);
+  }
+
+  /* ─────────────────  HERO  ───────────────── */
+  .hero {
+    background-color: #001345;
+    padding: 48px 32px 56px 32px;
+    text-align: center;
+    position: relative;
+  }
+  .hero-logo {
+    display: inline-block;
+    width: 168px;
+    height: auto;
+    max-width: 60%;
+  }
+  .hero-eyebrow {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #DEE6F3;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 18px;
+  }
+
+  /* Decorative signal-band: a row of small squares + electric-blue accent dot.
+     Rendered as a table so Outlook doesn't strip it. */
+  .signal-band {
+    width: 100%;
+    background-color: #FFFFFF;
+    padding: 14px 0;
+    text-align: center;
+    border-bottom: 1px solid #EEF1F8;
+  }
+  .signal-cell {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin: 0 4px;
+    background-color: #DEE6F3;
+    vertical-align: middle;
+  }
+  .signal-cell-active {
+    background-color: #1D69FB;
+    border-radius: 50%;
+  }
+
+  /* ─────────────────  CONTENT  ───────────────── */
+  .content { padding: 40px 40px 32px 40px; }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #1D69FB;
+    margin-bottom: 14px;
+  }
+  .eyebrow-muted { color: #718096; }
+
+  .heading {
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 800;
+    color: #001345;
+    margin: 0 0 20px 0;
+    letter-spacing: -0.6px;
+  }
+
+  .lede {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #1A202C;
+    margin: 0 0 16px 0;
+  }
+
+  .text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1A202C;
+    margin: 0 0 14px 0;
+  }
+
+  .muted { color: #718096; font-size: 13px; line-height: 1.6; }
+  .strong { font-weight: 700; color: #001345; }
+
+  /* ─────────────────  CTA  ───────────────── */
+  .cta-wrap { padding: 28px 0 8px 0; }
+  .cta {
+    display: inline-block;
+    background-color: #1D69FB;
+    color: #FFFFFF !important;
+    padding: 16px 36px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    mso-padding-alt: 16px 36px;
+  }
+  .cta-arrow {
+    display: inline-block;
+    margin-left: 8px;
+    font-weight: 400;
+  }
+
+  /* ─────────────────  CODE PANEL  ───────────────── */
+  .code-panel {
+    background-color: #001345;
+    border-radius: 12px;
+    padding: 32px 24px 28px 24px;
+    text-align: center;
+    margin: 24px 0 12px 0;
+  }
+  .code-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #1D69FB;
+    margin-bottom: 14px;
+  }
+  .code {
+    display: block;
+    font-size: 36px;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: 10px;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+    padding-left: 10px; /* compensate trailing letter-spacing for visual centering */
+  }
+
+  /* ─────────────────  DIVIDER  ───────────────── */
+  .divider {
+    height: 1px;
+    background-color: #EEF1F8;
+    border: 0;
+    margin: 28px 0;
+  }
+
+  /* ─────────────────  INFO TABLE  ───────────────── */
+  .info-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 8px 0 24px 0;
+  }
+  .info-table tr td {
+    padding: 14px 0;
+    font-size: 15px;
+    color: #001345;
+    vertical-align: top;
+    border-bottom: 1px solid #EEF1F8;
+  }
+  .info-table tr:last-child td { border-bottom: 0; }
+  .info-table td.label {
+    font-weight: 600;
+    color: #718096;
+    width: 140px;
+    white-space: nowrap;
+    padding-right: 16px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .info-table td.value { font-weight: 500; }
+  .info-table a { color: #1D69FB; }
+
+  /* ─────────────────  MESSAGE BOX  ───────────────── */
+  .quote {
+    background-color: #F4F6FA;
+    padding: 20px 24px;
+    margin: 8px 0 24px 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #1A202C;
+    white-space: pre-wrap;
+    border-radius: 10px;
+  }
+
+  /* ─────────────────  TYPE BADGES  ───────────────── */
+  .badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+  }
+  .badge-info { background-color: #DEE6F3; color: #001345; }
+  .badge-warning { background-color: #FEF3C7; color: #92400E; }
+
+  /* ─────────────────  PRIORITY NOTE  ───────────────── */
+  .priority {
+    background-color: #001345;
+    color: #FFFFFF;
+    padding: 18px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 4px 0 28px 0;
+  }
+  .priority strong { color: #FFFFFF; }
+
+  /* ─────────────────  STEPS  ───────────────── */
+  .steps {
+    margin: 8px 0 24px 0;
+    padding: 0;
+  }
+  .step {
+    padding: 16px 0;
+    border-top: 1px solid #EEF1F8;
+  }
+  .step:first-child { border-top: 0; padding-top: 8px; }
+  .step-number {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    border-radius: 8px;
+    background-color: #DEE6F3;
+    color: #001345;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 800;
+    margin-right: 14px;
+    vertical-align: middle;
+  }
+  .step-text {
+    font-size: 14px;
+    color: #1A202C;
+    vertical-align: middle;
+    line-height: 1.5;
+  }
+
+  /* ─────────────────  FOOTER  ───────────────── */
+  .footer {
+    background-color: #001345;
+    padding: 36px 32px;
+    text-align: center;
+    color: #DEE6F3;
+  }
+  .footer-logo {
+    display: inline-block;
+    width: 132px;
+    height: auto;
+    max-width: 50%;
+    margin-bottom: 14px;
+  }
+  .footer-tagline {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1D69FB;
+    letter-spacing: 0.5px;
+    margin-bottom: 18px;
+  }
+  .footer-text {
+    display: block;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #718096;
+    margin: 4px 0;
+  }
+  .footer-divider {
+    height: 1px;
+    width: 56px;
+    background-color: #1D69FB;
+    margin: 18px auto;
+    border: 0;
+  }
+
+  /* ─────────────────  MOBILE  ───────────────── */
+  @media only screen and (max-width: 480px) {
+    .page { padding: 0; }
+    .card { border-radius: 0; box-shadow: none; }
+    .hero { padding: 36px 20px 40px 20px; }
+    .hero-logo { width: 140px; }
+    .content { padding: 28px 20px 24px 20px; }
+    .heading { font-size: 24px; }
+    .lede { font-size: 15px; }
+    .code { font-size: 28px; letter-spacing: 6px; padding-left: 6px; }
+    .code-panel { padding: 24px 16px; }
+    .info-table td.label { width: 100px; font-size: 10px; }
+    .info-table td.value { font-size: 14px; }
+    .footer { padding: 28px 20px; }
+    .cta { display: block; padding: 14px 24px; }
+  }
+</style>
